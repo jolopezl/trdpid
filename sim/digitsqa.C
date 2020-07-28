@@ -15,14 +15,14 @@ void digitsqa( TString infilename="TRD.Digits.root",
   hAdc->SetYTitle("number of entries");
 
   TH1F* hTBsum = new TH1F("hTBsum", "TBsum", 3000, -0.5, 2999.5);
-
-
+  
+  TH2F *hADCvsTB = new TH2F("hADCvsTB", "ADC time spectrum;Time bin;ADC value", 31, -0.5, 30.5, 1024, -0.5, 1023.5);
+  TProfile *pADCvsTB = new TProfile("pADCvsTB", "ADC time spectrum;Time bin;ADC value", 31, -0.5, 30.5);
 
   TFile fd(infilename);
 
   AliTRDdigitsManager* digman = new AliTRDdigitsManager;
   digman->CreateArrays();
-
 
   TIter next(fd.GetListOfKeys());
   while ( TObject *obj = next() ) {
@@ -66,6 +66,9 @@ void digitsqa( TString infilename="TRD.Digits.root",
 
            hAdc->Fill(adc);
 
+           pADCvsTB->Fill(t,adc);
+	   hADCvsTB->Fill(t,adc);
+
            tbsum += adc;
          }
 
@@ -93,6 +96,12 @@ void digitsqa( TString infilename="TRD.Digits.root",
  TCanvas* cnv_tbsum = new TCanvas("cnv_tbsum", "cnv_tbsum");
  cnv_adc->SetLogy();
  hTBsum->Draw();
+ 
+ TCanvas* cnv_adctbhist = new TCanvas("cnv_adctbhist", "cnv_adctbprof");
+ hADCvsTB->Draw("COL");
+
+ TCanvas* cnv_adctbprof = new TCanvas("cnv_adctbprof", "cnv_adctbprof");
+ pADCvsTB->Draw();
 
  outfile->Write();
 
